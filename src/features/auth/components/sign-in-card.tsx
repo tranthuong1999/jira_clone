@@ -23,9 +23,12 @@ import {
 } from "@/components/ui/form";
 import { loginSchema } from "../schemas";
 import { DottedSeparator } from "@/components/dotted-separator";
+import { useLogin } from "../api/useLogin";
 
 
 const SignInCard = () => {
+
+    const { mutate: apiLogin } = useLogin();
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -38,6 +41,7 @@ const SignInCard = () => {
     const onSubmit = (values: z.infer<typeof loginSchema>) => {
         console.log("clicked")
         console.log({ values });
+        apiLogin({ json: values });
     };
 
     return (
