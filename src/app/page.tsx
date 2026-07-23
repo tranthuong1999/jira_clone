@@ -1,13 +1,14 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { UserButton } from "@/features/auth/components/user-button";
+import { getCurrent } from "@/features/auth/queries";
+import { redirect } from "next/navigation";
 
+const Home = async () => {
+    const user = await getCurrent();
+    if (!user) redirect("/sign-in");
 
-const Home = () => {
     return (
-        <div className="flex">
-            <Input />
-            <Button size="lg"> Default</Button>
-            <Button variant="destructive"> Default</Button>
+        <div>
+            <UserButton />
         </div>
     )
 }
