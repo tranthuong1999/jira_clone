@@ -26,8 +26,11 @@ import {
 import { registerSchema } from "../schemas";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Button } from "@/components/ui/button";
+import { useRegister } from "../api/useRegister";
 
 export const SignUpCard = () => {
+
+    const { mutate: registerApi } = useRegister();
 
     const form = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
@@ -40,7 +43,7 @@ export const SignUpCard = () => {
 
     const onSubmit = (values: z.infer<typeof registerSchema>) => {
         console.log({ values })
-        // mutate({ json: values });
+        registerApi({ json: values });
     };
 
     return (
