@@ -3,8 +3,8 @@
 import { useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "lib/utils";
-import { cn } from "lib/utils";
+import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Separator } from "@/src/components/ui/separator"
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
