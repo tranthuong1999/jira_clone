@@ -28,7 +28,7 @@ import { useLogin } from "../api/useLogin";
 
 const SignInCard = () => {
 
-    const { mutate: apiLogin } = useLogin();
+    const { mutate: apiLogin, isPending } = useLogin();
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -101,7 +101,7 @@ const SignInCard = () => {
             <CardContent className="p-7 flex flex-col gap-y-4">
                 <Button
                     // onClick={() => signUpWithGoogle()}
-                    // disabled={isPending}
+                    disabled={isPending}
                     variant="secondary"
                     size="lg"
                     className="w-full"
@@ -111,7 +111,7 @@ const SignInCard = () => {
                 </Button>
                 <Button
                     // onClick={() => signUpWithGithub()}
-                    // disabled={isPending}
+                    disabled={isPending}
                     variant="secondary"
                     size="lg"
                     className="w-full"

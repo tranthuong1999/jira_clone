@@ -32,7 +32,7 @@ export const useRegister = () => {
             queryClient.invalidateQueries({ queryKey: ["current"] });
         },
         onError: () => {
-            toast.error("Failed to log in");
+            toast.error("Failed to register");
         },
     });
 
