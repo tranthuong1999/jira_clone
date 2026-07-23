@@ -30,7 +30,7 @@ import { useRegister } from "../api/useRegister";
 
 export const SignUpCard = () => {
 
-    const { mutate: registerApi } = useRegister();
+    const { mutate: registerApi, isPending } = useRegister();
 
     const form = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
@@ -42,7 +42,6 @@ export const SignUpCard = () => {
     });
 
     const onSubmit = (values: z.infer<typeof registerSchema>) => {
-        console.log({ values })
         registerApi({ json: values });
     };
 
@@ -129,7 +128,7 @@ export const SignUpCard = () => {
             <CardContent className="p-7 flex flex-col gap-y-4">
                 <Button
                     // onClick={() => signUpWithGoogle()}
-                    // disabled={isPending}
+                    disabled={isPending}
                     variant="secondary"
                     size="lg"
                     className="w-full"
@@ -139,7 +138,7 @@ export const SignUpCard = () => {
                 </Button>
                 <Button
                     // onClick={() => signUpWithGithub()}
-                    // disabled={isPending}
+                    disabled={isPending}
                     variant="secondary"
                     size="lg"
                     className="w-full"

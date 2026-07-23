@@ -39,8 +39,6 @@ const SignInCard = () => {
     });
 
     const onSubmit = (values: z.infer<typeof loginSchema>) => {
-        console.log("clicked")
-        console.log({ values });
         apiLogin({ json: values });
     };
 
