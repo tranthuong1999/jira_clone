@@ -1,55 +1,44 @@
 import "server-only";
 
-import {
-    Account,
-    Client,
-    Databases,
-    Models,
-    Storage,
-    type Account as AccountType,
-    type Databases as DatabasesType,
-    type Storage as StorageType,
-    type Users as UsersType,
-} from "node-appwrite";
-
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { AUTH_COOKIE } from "@/features/auth/const";
+import { apiJiraUrl, authCookieHeader } from "@/lib/api-jira";
 
+export type ApiUser = {
+    _id: string;
+    name: string;
+    email: string;
+    avatar?: {
+        url: string;
+        publicId: string;
+    };
+};
 
 type AdditionalContext = {
     Variables: {
-        account: AccountType;
-        databases: DatabasesType;
-        storage: StorageType;
-        users: UsersType;
-        user: Models.User<Models.Preferences>;
+        user: ApiUser;
     };
 };
 
 export const sessionMiddleware = createMiddleware<AdditionalContext>(
     async (c, next) => {
-        const client = new Client()
-            .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-            .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
-
         const session = getCookie(c, AUTH_COOKIE);
 
         if (!session) {
             return c.json({ error: "Unauthorized" }, 401);
         }
 
-        client.setSession(session);
+        const response = await fetch(apiJiraUrl("/api/auth/me"), {
+            headers: authCookieHeader(session),
+            cache: "no-store",
+        });
 
-        const account = new Account(client);
-        const databases = new Databases(client);
-        const storage = new Storage(client);
+        if (!response.ok) {
+            return c.json({ error: "Unauthorized" }, 401);
+        }
 
-        const user = await account.get();
-
-        c.set("account", account);
-        c.set("databases", databases);
-        c.set("storage", storage);
+        const user = (await response.json()) as ApiUser;
         c.set("user", user);
 
         await next();
