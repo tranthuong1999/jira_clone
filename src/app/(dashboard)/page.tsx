@@ -1,5 +1,5 @@
-import { UserButton } from "@/features/auth/components/user-button";
 import { getCurrent } from "@/features/auth/queries";
+import { CreateWorkspaceForm } from "@/features/workspaces/components/create-workspace-form";
 import { redirect } from "next/navigation";
 
 const Home = async () => {
@@ -8,7 +8,7 @@ const Home = async () => {
 
     return (
         <div>
-            This is home page
+            <CreateWorkspaceForm />
         </div>
     )
 }

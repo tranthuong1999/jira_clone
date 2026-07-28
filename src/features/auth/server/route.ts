@@ -1,80 +1,89 @@
 import { Hono } from "hono";
-import { ID } from "node-appwrite";
-import { deleteCookie, setCookie } from "hono/cookie";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { zValidator } from "@hono/zod-validator";
-import { createAdminClient } from "@/lib/appwrite";
 import { loginSchema, registerSchema } from "../schemas";
 import { AUTH_COOKIE } from "../const";
 import { sessionMiddleware } from "@/lib/session-middleware";
+import {
+    apiJiraUrl,
+    authCookieHeader,
+    extractJwtFromResponse,
+} from "@/lib/api-jira";
+
+const cookieOptions = {
+    path: "/",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict" as const,
+    maxAge: 60 * 60 * 24 * 7,
+};
 
 const app = new Hono()
-    .get(
-        "/current",
-        sessionMiddleware,
-        (c) => {
-            const user = c.get("user");
+    .get("/current", sessionMiddleware, (c) => {
+        const user = c.get("user");
+        return c.json({ data: user });
+    })
+    .post("/login", zValidator("json", loginSchema), async (c) => {
+        const { email, password } = c.req.valid("json");
 
-            return c.json({ data: user });
+        const response = await fetch(apiJiraUrl("/api/auth/login"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+        });
+
+        if (!response.ok) {
+            return c.json({ error: "Invalid credentials" }, 401);
         }
-    )
-    .post(
-        "/login",
-        zValidator("json", loginSchema),
-        async (c) => {
-            const { email, password } = c.req.valid("json");
 
-            const { account } = await createAdminClient();
-            const session = await account.createEmailPasswordSession(
-                email,
-                password,
-            );
-
-            setCookie(c, AUTH_COOKIE, session.secret, {
-                path: "/",
-                httpOnly: true,
-                secure: true,
-                sameSite: "strict",
-                maxAge: 60 * 60 * 24 * 30,
-            });
-
-            return c.json({ success: true });
+        const token = extractJwtFromResponse(response);
+        if (!token) {
+            return c.json({ error: "Failed to establish session" }, 500);
         }
-    )
-    .post(
-        "/register",
-        zValidator("json", registerSchema),
-        async (c) => {
-            const { name, email, password } = c.req.valid("json");
 
-            const { account } = await createAdminClient();
-            await account.create(
-                ID.unique(),
-                email,
-                password,
-                name,
+        setCookie(c, AUTH_COOKIE, token, cookieOptions);
+
+        return c.json({ success: true });
+    })
+    .post("/register", zValidator("json", registerSchema), async (c) => {
+        const { name, email, password } = c.req.valid("json");
+
+        const response = await fetch(apiJiraUrl("/api/auth/sign-up"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password }),
+        });
+
+        if (!response.ok) {
+            const body = (await response.json().catch(() => null)) as
+                | { message?: string }
+                | null;
+            return c.json(
+                { error: body?.message ?? "Failed to register" },
+                400,
             );
-
-            const session = await account.createEmailPasswordSession(
-                email,
-                password,
-            );
-
-            setCookie(c, AUTH_COOKIE, session.secret, {
-                path: "/",
-                httpOnly: true,
-                secure: true,
-                sameSite: "strict",
-                maxAge: 60 * 60 * 24 * 30,
-            });
-
-            return c.json({ success: true });
         }
-    )
+
+        const token = extractJwtFromResponse(response);
+        if (!token) {
+            return c.json({ error: "Failed to establish session" }, 500);
+        }
+
+        setCookie(c, AUTH_COOKIE, token, cookieOptions);
+
+        return c.json({ success: true });
+    })
     .post("/logout", sessionMiddleware, async (c) => {
-        const account = c.get("account");
+        const token = getCookie(c, AUTH_COOKIE);
+
+        if (token) {
+            await fetch(apiJiraUrl("/api/auth/logout"), {
+                method: "POST",
+                headers: authCookieHeader(token),
+            }).catch(() => undefined);
+        }
 
         deleteCookie(c, AUTH_COOKIE);
-        await account.deleteSession("current");
 
         return c.json({ success: true });
     });
