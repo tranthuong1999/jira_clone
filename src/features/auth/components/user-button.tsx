@@ -11,11 +11,18 @@ import {
 import { DottedSeparator } from "@/components/dotted-separator";
 import { useLogout } from "../api/useLogout";
 import { useCurrent } from "../api/useCurrent";
+import { useRouter } from "next/navigation";
 
 
 export const UserButton = () => {
     const { mutate: logout } = useLogout();
     const { data: user, isLoading } = useCurrent();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        await logout();
+        router.replace("/sign-in");
+    }
 
     if (isLoading) {
         return (
@@ -60,7 +67,7 @@ export const UserButton = () => {
                 </div>
                 <DottedSeparator className="mb-1" />
                 <DropdownMenuItem
-                    onClick={() => logout()}
+                    onClick={handleLogout}
                     className="h-10 flex items-center justify-center text-amber-700 font-medium cursor-pointer"
                 >
                     <LogOut className="size-4 mr-2" />

@@ -4,6 +4,8 @@ import "./global.css";
 import QueryProvider from "../components/query-provider";
 import { Toaster } from "../components/ui/sonner";
 import { cn } from "@/lib/utils";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +26,9 @@ export default function RootLayout({
       >
         <QueryProvider>
           <Toaster />
-          {children}
+          <NuqsAdapter>
+            {children}
+          </NuqsAdapter>
         </QueryProvider>
       </body>
     </html>
