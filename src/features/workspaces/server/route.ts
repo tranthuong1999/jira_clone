@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
-import { createWorkspaceSchema } from "../schemas";
+import { createWorkspaceSchema, updateWorkspaceSchema } from "../schemas";
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { zValidator } from "@hono/zod-validator";
 import { AUTH_COOKIE } from "@/features/auth/const";
@@ -60,6 +60,65 @@ const app = new Hono()
                 response.status as 200 | 401 | 500
             );
         }
-    );
+    )
+    .patch(
+        "/:workspaceId",
+        sessionMiddleware,
+        async (c) => {
+            const token = getCookie(c, AUTH_COOKIE);
+            const { workspaceId } = c.req.param();
+
+            if (!token) {
+                return c.json({ error: "Unauthorized" }, 401);
+            }
+
+            const formData = await c.req.formData();
+
+            const response = await fetch(
+                apiJiraUrl(`/api/workspaces/${workspaceId}`),
+                {
+                    method: "PATCH",
+                    headers: authCookieHeader(token),
+                    body: formData,
+                }
+            );
+
+            const body = await response.json();
+
+            return c.json(
+                body,
+                response.status as 200 | 400 | 401 | 404 | 500
+            );
+        }
+    )
+
+    .get(
+        "/:workspaceId",
+        sessionMiddleware,
+        async (c) => {
+            const token = getCookie(c, AUTH_COOKIE);
+            const { workspaceId } = c.req.param();
+            if (!token) {
+                return c.json({ error: "Unauthorized" }, 401);
+            }
+            const response = await fetch(
+                apiJiraUrl(`/api/workspaces/${workspaceId}`),
+                {
+                    method: "GET",
+                    headers: authCookieHeader(token),
+                }
+            );
+            const body = await response.json().catch(() => ({
+                message: "Failed to fetch workspace",
+            }));
+
+            return c.json(
+                body,
+                response.status as 200 | 401 | 404 | 500
+            );
+        }
+    )
+
+
 
 export default app;

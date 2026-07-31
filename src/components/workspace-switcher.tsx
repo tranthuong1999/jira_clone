@@ -39,20 +39,22 @@ export const WorkSpaceSwitcher = () => {
                 </SelectTrigger>
 
                 <SelectContent>
-                    {workspaces?.map((workspace: Workspace) => (
-                        <SelectItem
-                            key={workspace._id}
-                            value={workspace._id}
-                        >
-                            <div className="flex items-center gap-3">
-                                <WorkspaceAvatar
-                                    name={workspace.name}
-                                    image={workspace.imageUrl}
-                                />
-                                <span>{workspace.name}</span>
-                            </div>
-                        </SelectItem>
-                    ))}
+                    {!!workspaces?.length && workspaces?.map((workspace: Workspace) => {
+                        return (
+                            <SelectItem
+                                key={workspace._id}
+                                value={workspace._id}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <WorkspaceAvatar
+                                        name={workspace.name}
+                                        image={workspace?.image?.url}
+                                    />
+                                    <span>{workspace.name}</span>
+                                </div>
+                            </SelectItem>
+                        )
+                    })}
                 </SelectContent>
             </Select>
         </div>
