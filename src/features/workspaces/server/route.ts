@@ -69,12 +69,25 @@ const app = new Hono()
     )
     .delete("/:workspaceId", sessionMiddleware, async (c) => {
         const { workspaceId } = c.req.param();
-        console.log("workspaceId delete", workspaceId)
         return proxyRequest(c, `/api/workspaces/${workspaceId}`, {
             method: "DELETE",
         });
-    });
+    })
+    .post(
+        "/:workspaceId/reset-invite-code",
+        sessionMiddleware,
+        async (c) => {
+            const { workspaceId } = c.req.param();
 
+            return proxyRequest(
+                c,
+                `/api/workspaces/${workspaceId}/reset-invite-code`,
+                {
+                    method: "POST",
+                }
+            );
+        }
+    )
 
 
 export default app;

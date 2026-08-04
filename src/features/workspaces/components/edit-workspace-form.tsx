@@ -29,7 +29,7 @@ import { updateWorkspaceSchema } from "../schemas";
 import { useUpdateWorkspace } from "../api/use-update-workspace";
 import { useDeleteWorkspace } from "../api/use-delete-workspace";
 import { Workspace } from "../type";
-// import { useResetInviteCode } from "../api/use-reset-invite-code";
+import { useResetInviteCode } from "../api/use-reset-invite-code";
 
 interface EditWorkspaceFormProps {
     onCancel?: () => void;
@@ -43,10 +43,10 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
         mutate: deleteWorkspace,
         isPending: isDeletingWorkspace
     } = useDeleteWorkspace();
-    // const {
-    //     mutate: resetInviteCode,
-    //     isPending: isResettingInviteCode
-    // } = useResetInviteCode();
+    const {
+        mutate: resetInviteCode,
+        isPending: isResettingInviteCode
+    } = useResetInviteCode();
 
     const [DeleteDialog, confirmDelete] = useConfirm(
         "Delete Workspace",
@@ -74,7 +74,6 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
         const ok = await confirmDelete();
 
         if (!ok) return;
-        console.log("initialValues handleDelete", initialValues._id)
         deleteWorkspace(initialValues._id, {
             onSuccess: () => {
                 window.location.href = '/'
@@ -83,15 +82,13 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
 
     };
 
-    // const handleResetInviteCode = async () => {
-    //     const ok = await confirmReset();
+    const handleResetInviteCode = async () => {
+        const ok = await confirmReset();
 
-    //     if (!ok) return;
+        if (!ok) return;
 
-    //     resetInviteCode({
-    //         param: { workspaceId: initialValues.$id },
-    //     });
-    // };
+        resetInviteCode(initialValues._id);
+    };
 
     const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
         const finalValues = {
@@ -112,12 +109,12 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
         }
     };
 
-    // const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
+    const fullInviteLink = `${window.location.origin}/workspaces/${initialValues._id}/join/${initialValues.inviteCode}`;
 
-    // const handleCopyInviteLink = () => {
-    //     navigator.clipboard.writeText(fullInviteLink)
-    //         .then(() => toast.success("Invite link copied to clipboard"));
-    // };
+    const handleCopyInviteLink = () => {
+        navigator.clipboard.writeText(fullInviteLink)
+            .then(() => toast.success("Invite link copied to clipboard"));
+    };
 
     return (
         <div className="flex flex-col gap-y-4">
@@ -256,7 +253,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
                 </CardContent>
             </Card>
 
-            {/* <Card className="w-ful h-full border-none shadow-none">
+            <Card className="w-ful h-full border-none shadow-none">
                 <CardContent className="p-7">
                     <div className="flex flex-col">
                         <h3 className="font-bold">Invite Members</h3>
@@ -288,7 +285,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
                         </Button>
                     </div>
                 </CardContent>
-            </Card> */}
+            </Card>
 
             <Card className="w-ful h-full border-none shadow-none">
                 <CardContent className="p-7">

@@ -8,4 +8,5 @@ export interface Workspace {
     userId: string;
     createdAt: string;
     updatedAt: string;
+    inviteCode: string;
 }
