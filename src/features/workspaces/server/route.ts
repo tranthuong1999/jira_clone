@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
-import { createWorkspaceSchema } from "../schemas";
+import { createWorkspaceSchema, joinWorkspaceSchema } from "../schemas";
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { zValidator } from "@hono/zod-validator";
 import { AUTH_COOKIE } from "@/features/auth/const";
@@ -85,6 +85,39 @@ const app = new Hono()
                 {
                     method: "POST",
                 }
+            );
+        }
+    )
+    .post(
+        "/:workspaceId/join",
+        sessionMiddleware,
+        zValidator("json", joinWorkspaceSchema),
+        async (c) => {
+            const { workspaceId } = c.req.param();
+            const body = c.req.valid("json");
+
+            return proxyRequest(
+                c,
+                `/api/workspaces/${workspaceId}/join`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body),
+                }
+            );
+        }
+    )
+    .get(
+        "/:workspaceId/info",
+        sessionMiddleware,
+        async (c) => {
+            const { workspaceId } = c.req.param();
+
+            return proxyRequest(
+                c,
+                `/api/workspaces/${workspaceId}/info`
             );
         }
     )

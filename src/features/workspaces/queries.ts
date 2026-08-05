@@ -17,6 +17,8 @@ export const getWorkspaces = async () => {
         }
     );
 
+    console.log("response getWorkspaces", response)
+
     if (!response.ok) {
         throw new Error("Failed to fetch workspaces");
     }

@@ -66,7 +66,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
         resolver: zodResolver(updateWorkspaceSchema),
         defaultValues: {
             ...initialValues,
-            image: initialValues.image.url ?? "",
+            image: initialValues?.image?.url ?? "",
         },
     });
 
