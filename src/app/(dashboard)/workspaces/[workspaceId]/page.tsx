@@ -1,11 +1,18 @@
+import { getCurrent } from '@/features/auth/queries'
+import { redirect } from 'next/navigation';
 
+const WorkspaceId = async ({ params }: {
+    params: Promise<{ workspaceId: string }>;
+}) => {
 
-import React from 'react'
+    const user = await getCurrent();
+    const { workspaceId } = await params;
 
-const WorkspaceId = () => {
+    if (!user) redirect("/sign-in")
+
     return (
         <div>
-            WorkspaceId
+            Workspace Id {workspaceId}
         </div>
     )
 }

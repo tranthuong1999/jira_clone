@@ -17,3 +17,10 @@ export const updateWorkspaceSchema = z.object({
     ])
         .optional(),
 });
+
+
+export const joinWorkspaceSchema = z.object({
+    code: z.string().min(1, "Invite code is required"),
+});
+
+export type JoinWorkspaceBody = z.infer<typeof joinWorkspaceSchema>;

@@ -11,6 +11,8 @@ const Home = async () => {
 
     const workspaces = await getWorkspaces();
 
+    console.log("workspaces Home", workspaces)
+
     if (!workspaces?.length) {
         redirect("/workspaces/create");
         return;
