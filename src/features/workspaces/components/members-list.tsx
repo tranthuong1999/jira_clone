@@ -52,6 +52,8 @@ export const MembersList = () => {
         deleteMember({ param: { memberId } });
     }
 
+    console.log("data", data)
+
     return (
         <Card className="w-full h-full border-none shadow-none">
             <ConfirmDialog />
