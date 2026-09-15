@@ -7,6 +7,7 @@ import { useProjectId } from "@/features/projects/hooks/use-project-id";
 import { useGetProject } from "@/features/projects/api/use-get-project";
 import { ProjectAvatar } from "@/features/projects/components/project-avatar";
 import { useGetProjectAnalytics } from "@/features/projects/api/use-get-project-analytics";
+import { TaskViewSwitcher } from "@/features/tasks/components/task-view-switcher";
 
 import { Button } from "@/components/ui/button";
 import { Analytics } from "@/components/analytics";
@@ -51,6 +52,7 @@ export const ProjectIdClient = () => {
             {analytics ? (
                 <Analytics data={analytics} />
             ) : null}
+            <TaskViewSwitcher hideProjectFilter />
         </div>
     )
 };
